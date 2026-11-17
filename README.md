@@ -27,7 +27,7 @@ O **Grimório** é uma aplicação web desenvolvida como atividade prática da d
 
 A aplicação permitirá cadastrar personagens, registrar atributos e perícias, administrar habilidades, controlar inventários, acompanhar a evolução dos personagens e organizar suas campanhas.
 
-O projeto será desenvolvido utilizando Python e FastAPI no backend, com uma API REST para comunicação com a interface web e um banco de dados relacional para armazenar as informações.
+O projeto será desenvolvido utilizando Python e FastAPI no backend como uma **API REST pura (Machine to Machine / M2M)**, focada exclusivamente na troca e validação de dados em formato JSON, sem acoplamento com interface web gráfica ou renderização de HTML (eliminando a interação direta usuário-máquina no backend).
 
 A proposta é desenvolver a aplicação progressivamente, aplicando os conceitos estudados durante a disciplina e utilizando como referência a metodologia prática do curso [FastAPI do Zero](https://fastapidozero.dunossauro.com/estavel/01/).
 
@@ -38,7 +38,7 @@ A proposta é desenvolver a aplicação progressivamente, aplicando os conceitos
 - Implementar operações CRUD para o gerenciamento dos dados.
 - Modelar e integrar um banco de dados relacional.
 - Implementar autenticação e autorização de usuários.
-- Construir uma interface web responsiva e intuitiva.
+- Projetar e disponibilizar uma API REST pura orientada à comunicação Máquina para Máquina (M2M) via JSON e OpenAPI.
 - Desenvolver testes automatizados para validar o funcionamento da aplicação.
 - Utilizar Git e GitHub para versionamento e documentação do projeto.
 - Aplicar boas práticas de organização, segurança e manutenção de código.
@@ -56,9 +56,8 @@ O projeto utilizará tecnologias do ecossistema Python, seguindo a abordagem de 
 | SQLite | Banco de dados inicial para desenvolvimento local. |
 | PostgreSQL | Banco de dados previsto para implantação em produção. |
 | Alembic | Controle e execução de migrações do banco de dados. |
-| HTML5 | Estrutura das páginas web. |
-| CSS3 | Estilização e responsividade da interface. |
-| JavaScript | Interatividade e integração da interface com a API. |
+| JSON | Formato padrão para tráfego e intercâmbio de dados Máquina para Máquina (M2M). |
+| OpenAPI / Swagger | Especificação e documentação interativa dos contratos da API REST. |
 | JWT | Autenticação por tokens, quando aplicável à estratégia de sessão escolhida. |
 | pytest | Testes automatizados da aplicação. |
 | Ruff | Análise estática e formatação do código Python. |
@@ -254,23 +253,19 @@ O sistema poderá organizar personagens em campanhas e registrar acontecimentos 
 - [ ] Tratar arquivos inválidos e versões incompatíveis.
 - [ ] Evitar sobrescrever personagens existentes sem confirmação.
 
-### 4.13. Personalização da interface
+### 4.13. Comunicação e Integração Máquina para Máquina (M2M)
 
-- [ ] Interface adaptável para computadores, tablets e celulares.
-- [ ] Tema claro e tema escuro.
-- [ ] Personalização do retrato e da aparência da ficha.
-- [ ] Organização das informações em abas ou seções.
-- [ ] Formulários com validação e mensagens de erro.
-- [ ] Confirmação antes de operações destrutivas.
-- [ ] Navegação acessível por teclado.
-- [ ] Contraste e legibilidade adequados.
-- [ ] Estados visuais para carregamento, ausência de dados e falhas.
-- [ ] Interface consistente em todas as páginas.
+- [ ] API REST pura, trafegando exclusivamente payloads em JSON.
+- [ ] Ausência de acoplamento com camadas de apresentação ou renderização HTML (sem interação usuário-máquina no backend).
+- [ ] Contratos de dados estritos e validação automática via Pydantic.
+- [ ] Padronização de códigos de status HTTP para sucesso, validação e erros.
+- [ ] Documentação automática da API via OpenAPI (Swagger UI e ReDoc).
+- [ ] Respostas estruturadas para consumo por clientes automatizados, microsserviços ou aplicações externas.
 
 ### 4.14. Administração e segurança dos dados
 
 - [ ] Garantir que cada usuário acesse somente os dados autorizados.
-- [ ] Validar os dados no backend, independentemente das validações do frontend.
+- [ ] Validar rigorosamente todos os dados recebidos nas requisições JSON da API via Pydantic.
 - [ ] Utilizar consultas parametrizadas e os recursos seguros do ORM.
 - [ ] Configurar variáveis de ambiente para informações sensíveis.
 - [ ] Tratar erros sem expor detalhes internos da aplicação.
@@ -296,7 +291,7 @@ Os requisitos funcionais descrevem as ações que o sistema deverá executar.
 | RF09 | O sistema deve permitir registrar a evolução dos personagens. |
 | RF10 | O sistema deve permitir organizar personagens em campanhas. |
 | RF11 | O sistema deve permitir pesquisar, filtrar e ordenar personagens. |
-| RF12 | O sistema deve validar dados enviados pela interface e pela API. |
+| RF12 | O sistema deve validar todos os dados trafegados nas requisições JSON da API. |
 | RF13 | O sistema deve permitir exportar e importar fichas em formato JSON. |
 | RF14 | O sistema deve apresentar mensagens apropriadas para operações realizadas e erros. |
 | RF15 | O sistema deve proteger informações privadas e impedir acessos não autorizados. |
@@ -305,7 +300,7 @@ Os requisitos funcionais descrevem as ações que o sistema deverá executar.
 
 | Código | Requisito |
 |---|---|
-| RNF01 | A aplicação deve possuir interface responsiva. |
+| RNF01 | A aplicação deve operar como API REST pura (M2M), trafegando exclusivamente JSON. |
 | RNF02 | O backend deve ser desenvolvido em Python utilizando FastAPI. |
 | RNF03 | A API deve seguir uma estrutura REST e utilizar códigos HTTP apropriados. |
 | RNF04 | Os dados persistentes devem ser armazenados em banco de dados relacional. |
@@ -318,35 +313,31 @@ Os requisitos funcionais descrevem as ações que o sistema deverá executar.
 | RNF11 | As migrações do banco de dados devem ser versionadas. |
 | RNF12 | O projeto deve utilizar Git para controle de versão. |
 | RNF13 | A aplicação deve permitir manutenção e inclusão de novas funcionalidades sem reescrever toda a estrutura. |
-| RNF14 | A interface deve observar princípios básicos de acessibilidade e usabilidade. |
+| RNF14 | A API deve seguir as convenções REST e especificação OpenAPI para fácil consumo por clientes externos (M2M). |
 
 ## 7. Arquitetura da aplicação
 
-A aplicação será dividida em três partes principais:
+A aplicação é projetada sob a arquitetura de **API REST pura (Machine to Machine / M2M)**, sem camada de apresentação gráfica (HTML) acoplada no backend:
 
-1. **Frontend:** interface desenvolvida com HTML, CSS e JavaScript, responsável pela interação com o usuário.
-2. **Backend:** API desenvolvida com FastAPI, responsável pelas regras de negócio, validação, autenticação e processamento das requisições.
-3. **Banco de dados:** responsável por armazenar usuários, personagens, atributos, habilidades, inventários e campanhas.
+1. **Cliente Consumidor / Sistema Externo (M2M):** aplicações clientes, ferramentas de linha de comando ou outros serviços que consomem a API via HTTP/JSON.
+2. **Backend (API REST):** desenvolvido com FastAPI e Pydantic, responsável pelos contratos de dados, validação, regras de negócio e processamento das requisições.
+3. **Banco de dados:** responsável por armazenar os dados das entidades do sistema.
 
-Fluxo básico de funcionamento:
+Fluxo básico de funcionamento (M2M):
 
 ```text
-Usuário
+Cliente / Sistema Externo (Máquina)
    |
-   v
-Interface Web
-HTML + CSS + JavaScript
-   |
-   | Requisições HTTP / JSON
+   | Requisições HTTP / Payloads JSON (M2M)
    v
 API REST
-FastAPI + Pydantic
+FastAPI + Pydantic (Validação de Schemas)
    |
    v
-Regras de negócio
+Regras de negócio e Serviços
    |
    v
-SQLAlchemy
+Camada de Persistência (SQLAlchemy / Memória)
    |
    v
 Banco de dados
@@ -380,19 +371,13 @@ grimorio/
 │   │   ├── habilidades.py
 │   │   ├── inventario.py
 │   │   └── campanhas.py
-│   ├── services/
-│   │   ├── personagens.py
-│   │   └── campanhas.py
-│   └── templates/
-├── frontend/
-│   ├── index.html
-│   ├── css/
-│   ├── js/
-│   └── assets/
+│   └── services/
+│       ├── personagens.py
+│       └── campanhas.py
 ├── tests/
-│   ├── test_usuarios.py
-│   ├── test_autenticacao.py
-│   └── test_personagens.py
+│   ├── conftest.py
+│   ├── test_app.py
+│   └── test_schemas.py
 ├── alembic/
 ├── .env.example
 ├── .gitignore
