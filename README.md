@@ -436,7 +436,8 @@ grimorio/
 │   │   ├── autenticacao.py
 │   │   ├── personagem.py
 │   │   ├── habilidade.py
-│   │   └── inventario.py
+│   │   ├── inventario.py
+│   │   └── campanha.py
 │   ├── routers/
 │   │   ├── usuarios.py
 │   │   ├── autenticacao.py
@@ -450,6 +451,7 @@ grimorio/
 │       └── autenticacao.py
 ├── tests/
 │   ├── conftest.py
+│   ├── test_app.py
 │   ├── test_auth.py
 │   ├── test_personagens.py
 │   └── test_schemas.py

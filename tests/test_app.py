@@ -133,3 +133,66 @@ def test_delete_campanha_not_found(client):
 
     assert response.status_code == HTTPStatus.NOT_FOUND
     assert response.json() == {"detail": "Campanha not found"}
+
+
+def test_create_usuario_and_login(client):
+    res_user = client.post(
+        "/usuarios",
+        json={
+            "email": "mestre@rpg.com",
+            "senha": "password123",
+            "nome": "Mestre",
+        },
+    )
+    assert res_user.status_code == HTTPStatus.CREATED
+    assert res_user.json()["email"] == "mestre@rpg.com"
+
+    res_login = client.post(
+        "/auth/token",
+        json={"email": "mestre@rpg.com", "senha": "password123"},
+    )
+    assert res_login.status_code == HTTPStatus.OK
+    token = res_login.json()["access_token"]
+    assert token is not None
+
+    res_me = client.get(
+        "/usuarios/me", headers={"Authorization": f"Bearer {token}"}
+    )
+    assert res_me.status_code == HTTPStatus.OK
+    assert res_me.json()["email"] == "mestre@rpg.com"
+
+
+def test_create_and_get_personagem(client):
+    client.post(
+        "/usuarios",
+        json={
+            "email": "mestre@rpg.com",
+            "senha": "password123",
+            "nome": "Mestre",
+        },
+    )
+    token = client.post(
+        "/auth/token",
+        json={"email": "mestre@rpg.com", "senha": "password123"},
+    ).json()["access_token"]
+    headers = {"Authorization": f"Bearer {token}"}
+
+    res_p = client.post(
+        "/personagens",
+        json={
+            "nome": "Aragorn",
+            "sistema_rpg": "D&D 5e",
+            "nivel": 5,
+        },
+        headers=headers,
+    )
+    assert res_p.status_code == HTTPStatus.CREATED
+    p_id = res_p.json()["id"]
+
+    res_list = client.get("/personagens", headers=headers)
+    assert res_list.status_code == HTTPStatus.OK
+    assert res_list.json()["total"] == 1
+
+    res_get = client.get(f"/personagens/{p_id}", headers=headers)
+    assert res_get.status_code == HTTPStatus.OK
+    assert res_get.json()["nome"] == "Aragorn"
